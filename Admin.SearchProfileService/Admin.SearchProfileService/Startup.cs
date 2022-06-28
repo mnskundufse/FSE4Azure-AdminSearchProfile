@@ -35,6 +35,11 @@ namespace Admin.SearchProfileService
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
             services.Configure<AzureServiceBusConfig>(Configuration.GetSection("AzureServiceBusConfig"));
 
+            services.AddStackExchangeRedisCache(setupAction =>
+            {
+                setupAction.Configuration = Configuration.GetConnectionString("RedisCache");
+            });
+
             services.AddScoped<ISearchProfileBusiness, SearchProfileBusiness>();
 
             var config = new ServerConfig();

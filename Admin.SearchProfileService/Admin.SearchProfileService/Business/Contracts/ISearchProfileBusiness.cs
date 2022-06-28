@@ -1,10 +1,12 @@
 ﻿using Admin.SearchProfileService.Model;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Admin.SearchProfileService.Business.Contracts
 {
     public interface ISearchProfileBusiness
     {
-        Task<ApiResponse> GetEngineerProfilesDetailsBusiness(string criteria, string criteriaValue, int? perPage, int? page);
+        bool ValidateRequest(string criteria, string criteriaValue, ref ApiResponse response);
+        Task<List<UserProfileForAdminDatabase>> GetAllUserProfileBusiness();
     }
 }
