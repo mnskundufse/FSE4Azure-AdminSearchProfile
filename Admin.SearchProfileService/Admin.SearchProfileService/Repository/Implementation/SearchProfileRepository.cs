@@ -11,172 +11,19 @@ namespace Admin.SearchProfileService.Repository.Implementation
     public class SearchProfileRepository : ISearchProfileRepository
     {
         private readonly ISearchProfileContext _context;
+
         public SearchProfileRepository(ISearchProfileContext context)
         {
             _context = context;
         }
 
-        public async Task<ApiResponse> GetEngineerProfilesDetailsRepository(string criteria, string criteriaValue, int? perPage, int? page)
+        /// <summary>
+        /// Get all documents from MongoDB Collection
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<UserProfileForAdminDatabase>> GetAllUserProfileRepository()
         {
-            ApiResponse response = new ApiResponse();
-            UserProfilesDetails userProfileDetails = null;
-            if (string.Compare(criteria.ToUpper(), "NAME") == 0)
-            {
-                if (perPage.HasValue && perPage.Value > 0 && page.HasValue && page.Value > 0)
-                {
-                    List<UserProfileForAdminDatabase> userProfileList = await _context.UserProfileForAdminDatabase
-                            .Find(f => f.Name.ToUpper().Contains(criteriaValue.ToUpper()))
-                            .Skip((page - 1) * perPage)
-                            .Limit(perPage)
-                            .ToListAsync();
-
-                    double totalDocuments = await _context.UserProfileForAdminDatabase.CountDocumentsAsync(f => f.Name.ToUpper().Contains(criteriaValue.ToUpper()));
-                    if (totalDocuments > 0)
-                    {
-                        var totalPages = Math.Ceiling(totalDocuments / perPage.Value);
-
-                        userProfileDetails = new UserProfilesDetails()
-                        {
-                            XTotal = (int)totalDocuments,
-                            XTotalPages = (int)totalPages,
-                            XPerPage = perPage.Value,
-                            XPage = page.Value,
-                            UserList = userProfileList
-                        };
-                    }
-                }
-                else
-                {
-                    List<UserProfileForAdminDatabase> userProfileList = await _context.UserProfileForAdminDatabase
-                            .Find(f => f.Name.ToUpper().Contains(criteriaValue.ToUpper()))
-                            .ToListAsync();
-
-                    double totalDocuments = userProfileList.Count;
-                    if (totalDocuments > 0)
-                    {
-                        userProfileDetails = new UserProfilesDetails()
-                        {
-                            XTotal = (int)totalDocuments,
-                            XTotalPages = 1,
-                            XPerPage = 0,
-                            XPage = 0,
-                            UserList = userProfileList
-                        };
-                    }
-                }
-            }
-            else if (string.Compare(criteria.ToUpper(), "ASSOCIATE ID") == 0)
-            {
-                if (perPage.HasValue && perPage.Value > 0 && page.HasValue && page.Value > 0)
-                {
-                    List<UserProfileForAdminDatabase> userProfileList = await _context.UserProfileForAdminDatabase
-                                .Find(f => f.AssociateId.Equals(criteriaValue.ToUpper()))
-                                .Skip((page - 1) * perPage)
-                                .Limit(perPage)
-                                .ToListAsync();
-                    
-                    double totalDocuments = await _context.UserProfileForAdminDatabase.CountDocumentsAsync(f => f.AssociateId.Contains(criteriaValue.ToUpper()));
-                    if (totalDocuments > 0)
-                    {
-                        var totalPages = Math.Ceiling(totalDocuments / perPage.Value);
-
-                        userProfileDetails = new UserProfilesDetails()
-                        {
-                            XTotal = (int)totalDocuments,
-                            XTotalPages = (int)totalPages,
-                            XPerPage = perPage.Value,
-                            XPage = page.Value,
-                            UserList = userProfileList
-                        };
-                    }
-                }
-                else
-                {
-                    List<UserProfileForAdminDatabase> userProfileList = await _context.UserProfileForAdminDatabase
-                            .Find(f => f.AssociateId.Equals(criteriaValue.ToUpper()))
-                            .ToListAsync();
-
-                    double totalDocuments = userProfileList.Count;
-                    if (totalDocuments > 0)
-                    {
-                        userProfileDetails = new UserProfilesDetails()
-                        {
-                            XTotal = (int)totalDocuments,
-                            XTotalPages = 1,
-                            XPerPage = 0,
-                            XPage = 0,
-                            UserList = userProfileList
-                        };
-                    }
-                }
-            }
-            else if (string.Compare(criteria.ToUpper(), "SKILL") == 0)
-            {
-                if (perPage.HasValue && perPage.Value > 0 && page.HasValue && page.Value > 0)
-                {
-                    List<UserProfileForAdminDatabase> userProfileList = await _context.UserProfileForAdminDatabase
-                            .Find(f => f.TechnicalSkillDetails.Any(o => o.SkillName.Equals(criteriaValue.ToUpper()) && o.SkillValue > 10) ||
-                                        f.NonTechnicalSkillDetails.Any(o => o.SkillName.Equals(criteriaValue.ToUpper()) && o.SkillValue > 10))
-                            .Skip((page - 1) * perPage)
-                            .Limit(perPage)
-                            .ToListAsync();
-
-                    double totalDocuments = await _context.UserProfileForAdminDatabase.CountDocumentsAsync(f => f.TechnicalSkillDetails.Any(o => o.SkillName.Equals(criteriaValue.ToUpper()) && o.SkillValue > 10) ||
-                                        f.NonTechnicalSkillDetails.Any(o => o.SkillName.Equals(criteriaValue.ToUpper()) && o.SkillValue > 10));
-                    if (totalDocuments > 0)
-                    {
-                        var totalPages = Math.Ceiling(totalDocuments / perPage.Value);
-
-                        userProfileDetails = new UserProfilesDetails()
-                        {
-                            XTotal = (int)totalDocuments,
-                            XTotalPages = (int)totalPages,
-                            XPerPage = perPage.Value,
-                            XPage = page.Value,
-                            UserList = userProfileList
-                        };
-                    }
-                }
-                else
-                {
-                    List<UserProfileForAdminDatabase> userProfileList = await _context.UserProfileForAdminDatabase
-                            .Find(f => f.TechnicalSkillDetails.Any(o => o.SkillName.Equals(criteriaValue.ToUpper()) && o.SkillValue > 10) ||
-                                        f.NonTechnicalSkillDetails.Any(o => o.SkillName.Equals(criteriaValue.ToUpper()) && o.SkillValue > 10))
-                            .ToListAsync();
-
-                    double totalDocuments = userProfileList.Count;
-                    if (totalDocuments > 0)
-                    {
-                        userProfileDetails = new UserProfilesDetails()
-                        {
-                            XTotal = (int)totalDocuments,
-                            XTotalPages = 1,
-                            XPerPage = 0,
-                            XPage = 0,
-                            UserList = userProfileList
-                        };
-                    }
-                }
-            }
-
-            if (userProfileDetails != null && userProfileDetails.XTotal > 0)
-            {
-                userProfileDetails.UserList.ToList().ForEach(u =>
-                {
-                    u.TechnicalSkillDetails = u.TechnicalSkillDetails.OrderByDescending(o => Convert.ToInt32(o.SkillValue)).ToList();
-                    u.NonTechnicalSkillDetails = u.NonTechnicalSkillDetails.OrderByDescending(o => Convert.ToInt32(o.SkillValue)).ToList();
-                });
-                response.Result = userProfileDetails;
-            }
-            else
-            {
-                response.Result = null;
-                response.Status.Message = "NO RECORD FOUND";
-                response.Status.IsValid = false;
-                response.Status.Status = "FAIL";
-            }
-
-            return response;
+            return await _context.UserProfileForAdminDatabase.Find(_ => true).ToListAsync();
         }
 
         public async Task InsertUserProfileRepository(UserProfile userProfile)

@@ -17,17 +17,7 @@ namespace Admin.SearchProfileService.Business.Implementation
             _repo = repo;
         }
 
-        public async Task<ApiResponse> GetEngineerProfilesDetailsBusiness(string criteria, string criteriaValue, int? perPage, int? page)
-        {
-            ApiResponse response = new ApiResponse();
-            if (ValidateRequest(criteria, criteriaValue, ref response))
-            {
-                response = await _repo.GetEngineerProfilesDetailsRepository(criteria, criteriaValue, perPage, page);
-            }
-            return response;
-        }
-
-        private bool ValidateRequest(string criteria, string criteriaValue, ref ApiResponse response)
+        public bool ValidateRequest(string criteria, string criteriaValue, ref ApiResponse response)
         {
             bool isValidated = true;
             if (string.Compare(criteria.ToUpper(), "NAME") == 0)
@@ -75,6 +65,11 @@ namespace Admin.SearchProfileService.Business.Implementation
                 throw new InvalidSearchCriteriaException(criteria);
             }
             return isValidated;
+        }
+
+        public async Task<List<UserProfileForAdminDatabase>> GetAllUserProfileBusiness()
+        {
+            return await _repo.GetAllUserProfileRepository();
         }
     }
 }
